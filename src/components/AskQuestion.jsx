@@ -34,10 +34,9 @@ function AskQuestion() {
             }
         }
 
-        if (question.trim() === '')
-            getDefaultQuestion();
+        getDefaultQuestion();
 
-    }, [question]);
+    }, []);
 
     useEffect(() => {
         if (answer.trim() === '') {
