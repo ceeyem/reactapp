@@ -10,7 +10,6 @@ function AskQuestion() {
     const [askAnother, showAskAnother] = useState(false);
     const [showingAnswer, isShowingAnswer] = useState(false);
     const questionAreaRef = useRef(null);
-    const askAntoherRef = useRef(null);
     function askAnotherQuestion() {
         setAnswer("");
         setQuestion("");
@@ -55,7 +54,6 @@ function AskQuestion() {
         typewriter.typeString(`${answer}`)
             .callFunction(() => {
                 showAskAnother(true);
-                askAntoherRef.current.focus();
             })
             .start();
 
@@ -125,7 +123,7 @@ function AskQuestion() {
                         <p>   <br />
                             <strong>Answer: </strong>   <span id="answer-text"></span>    <br />
                             {askAnother &&
-                                <button id="ask-another-button" ref={askAntoherRef} onClick={askAnotherQuestion}>Ask another question</button>
+                                <button id="ask-another-button" onClick={askAnotherQuestion}>Ask another question</button>
                             }
                         </p>
                         :
