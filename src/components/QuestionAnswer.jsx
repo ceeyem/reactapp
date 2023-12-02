@@ -6,6 +6,7 @@ function QuestionAnswer() {
 
     const [questionAnswer, setQuestion] = useState(null);
     const { id } = useParams();
+    const [, setLoading] = useState(true);
 
     useEffect(() => {
         const loadQuestion = async () => {
@@ -21,18 +22,20 @@ function QuestionAnswer() {
                 // setError("An error occured whe fetching question with id:", id);
                 console.log("Error", e.toString());
             }
+            finally {
+                setLoading(false);
+            }
         };
         loadQuestion();
 
     }, [id]);
 
-    if (!questionAnswer) return <h2>Not Question found.. </h2>
+    if (!questionAnswer) return <h2>Loading.. </h2>
 
     return (
         <div>
             <h2>{questionAnswer.question}</h2>
             <p>{questionAnswer.answer}</p>
-            <p>{questionAnswer.ask_count}</p>
         </div>
     )
 
