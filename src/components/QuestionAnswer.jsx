@@ -7,7 +7,7 @@ function QuestionAnswer() {
     const [questionAnswer, setQuestion] = useState(null);
     const { id } = useParams();
     const [, setLoading] = useState(true);
-
+    const [found, setFound] = useState("Loading..");
     useEffect(() => {
         const loadQuestion = async () => {
             try {
@@ -16,11 +16,13 @@ function QuestionAnswer() {
                     const json = await response.json();
                     setQuestion(json);
                 } else {
+                    setFound("Not found");
                     throw response;
                 }
             } catch (e) {
                 // setError("An error occured whe fetching question with id:", id);
                 console.log("Error", e.toString());
+                setFound("Not found");
             }
             finally {
                 setLoading(false);
@@ -30,7 +32,7 @@ function QuestionAnswer() {
 
     }, [id]);
 
-    if (!questionAnswer) return <h2>Loading.. </h2>
+    if (!questionAnswer) return <h2>{found}</h2>
 
     return (
         <div>
