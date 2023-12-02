@@ -53,6 +53,7 @@ function AskQuestion() {
 
         typewriter.typeString(`${answer}`)
             .callFunction(() => {
+                window.history.pushState({}, null, "/questions/" + window.newQuestionId);
                 showAskAnother(true);
             })
             .start();
@@ -80,6 +81,7 @@ function AskQuestion() {
             const result = await response.json();
             //console.log(JSON.stringify(result));
             setAnswer(`${result.answer}`);
+            window.newQuestionId = result.id;
         } else {
             console.log("An error occurred.");
         }
