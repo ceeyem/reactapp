@@ -1,25 +1,54 @@
 import bookImg from '../book.png';
 import React, { useEffect, useState, useRef } from "react";
-import { API_ASK_URL } from "../constants";
+import { API_ASK_URL, API_QUESTIONS_URL } from "../constants";
 import Typewriter from 'typewriter-effect/dist/core';
+import { useParams } from 'react-router-dom';
 
 function AskQuestion() {
 
     const [question, setQuestion] = useState("");
     const [answer, setAnswer] = useState("");
+    const [questionId, setQuestionId] = useState("");
     const [askAnother, showAskAnother] = useState(false);
-    const [showingAnswer, isShowingAnswer] = useState(false);
+    const [showingAnswer, setShowingAnswer] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const questionAreaRef = useRef(null);
+    const { id } = useParams();
+
     function askAnotherQuestion() {
         setAnswer("");
-        setQuestion("");
         showAskAnother(false);
-        isShowingAnswer(false);
+        setShowingAnswer(false);
         questionAreaRef.current.focus();
     }
 
-
     useEffect(() => {
+
+        if (id === undefined) {
+            getDefaultQuestion();
+            return;
+        }
+        showAskAnother(true);
+        async function loadQuestion() {
+            try {
+                setLoading(true);
+                console.log(`loading question with ${id}`)
+                const response = await fetch(`${API_QUESTIONS_URL}/${id}`);
+                if (response.ok) {
+                    const json = await response.json();
+                    //console.log(json);
+                    setQuestion(json.question);
+                    setAnswer(json.answer);
+                    setLoading(false);
+                } else {
+                    throw response;
+                }
+            } catch (e) {
+                // setError("An error occured whe fetching question with id:", id);
+                console.log("[loadQuestion] Error", e.toString());
+            }
+        };
+
         async function getDefaultQuestion() {
             try {
                 const response = await fetch(API_ASK_URL);
@@ -34,31 +63,38 @@ function AskQuestion() {
             }
         }
 
-        getDefaultQuestion();
+        loadQuestion();
 
-    }, []);
+    }, [id]);
+
 
     useEffect(() => {
+
         if (answer.trim() === '') {
             questionAreaRef.current.focus();
             return;
         }
+        if (id === undefined) {
+            const typeDelay = randomNumberInRange(30, 70);
+            // console.log(typeDelay);
+            var typewriter = new Typewriter('#answer-text', {
+                autoStart: false,
+                delay: typeDelay,
+            });
 
-        const typeDelay = randomNumberInRange(30, 70);
-        // console.log(typeDelay);
-        var typewriter = new Typewriter('#answer-text', {
-            autoStart: false,
-            delay: typeDelay,
-        });
+            typewriter.typeString(`${answer}`)
+                .callFunction(() => {
+                    window.history.pushState({}, null, "/question/" + questionId);
+                    showAskAnother(true);
+                })
+                .start();
+        }
+        else {
+            showAskAnother(true);
+        }
 
-        typewriter.typeString(`${answer}`)
-            .callFunction(() => {
-                window.history.pushState({}, null, "/questions/" + window.newQuestionId);
-                showAskAnother(true);
-            })
-            .start();
 
-    }, [answer]);
+    }, [answer, id]);
 
     function randomNumberInRange(min, max) {
         // 👇️ get number between min (inclusive) and max (inclusive)
@@ -67,7 +103,7 @@ function AskQuestion() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        isShowingAnswer(true);
+        setShowingAnswer(true);
         const postData = { question };
         const response = await fetch(API_ASK_URL, {
             method: "POST",
@@ -81,7 +117,8 @@ function AskQuestion() {
             const result = await response.json();
             //console.log(JSON.stringify(result));
             setAnswer(`${result.answer}`);
-            window.newQuestionId = result.id;
+            console.log("new question id", result.id)
+            setQuestionId(result.id);
         } else {
             console.log("An error occurred.");
         }
@@ -99,6 +136,7 @@ function AskQuestion() {
             </div>
 
             <div className="main">
+                {isLoading && <p>Loading...</p>}
                 <form onSubmit={handleSubmit}>
                     <div>
                         <textarea
@@ -109,6 +147,7 @@ function AskQuestion() {
                             onChange={(e) => setQuestion(e.target.value)}
                             required
                         />
+
                         {answer.length < 1 &&
                             <div className="buttons" >
                                 <button type="submit" disabled={showingAnswer} id="ask-button" >Ask question</button>
@@ -116,14 +155,12 @@ function AskQuestion() {
                             </div>
                         }
                     </div>
-
                 </form>
-
 
                 <div id="answer-container">
                     {answer.length > 0 ?
                         <p>   <br />
-                            <strong>Answer: </strong>   <span id="answer-text"></span>    <br />
+                            <strong>Answer: </strong>   <span id="answer-text">{answer}</span>    <br />
                             {askAnother &&
                                 <button id="ask-another-button" onClick={askAnotherQuestion}>Ask another question</button>
                             }
@@ -133,8 +170,6 @@ function AskQuestion() {
                     }
                 </div>
                 <div>
-
-
 
                 </div>
             </div>

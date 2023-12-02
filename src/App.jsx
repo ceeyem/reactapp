@@ -1,4 +1,4 @@
-import {BrowserRouter as Router, Route, Routes  } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import Footer from "./components/Footer";
 
@@ -6,21 +6,20 @@ import Footer from "./components/Footer";
 import "./App.css";
 
 // import components
-import QuestionAnswer from "./components/QuestionAnswer";
 import AskQuestion from "./components/AskQuestion";
 import Dashboard from "./components/Dashboard";
 import LoginPage from "./components/LoginPage";
 
 function App() {
 
-    return(
+    return (
         <Router>
             <div className="app" >
                 <Routes>
-                    <Route path="/" element={ <AskQuestion />} />
-                    <Route path="/questions/:id" element={ <QuestionAnswer />} />
-                    <Route path="/login" element={ <LoginPage /> } />
-                    <Route path="/dashboard" element={ <Dashboard /> }
+                    <Route path="/" element={<AskQuestion />} />
+                    <Route path="/question/:id" element={<AskQuestion />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/dashboard" element={<Dashboard />}
                     />
                 </Routes>
                 <Footer />
