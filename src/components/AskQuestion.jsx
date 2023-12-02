@@ -74,27 +74,21 @@ function AskQuestion() {
             questionAreaRef.current.focus();
             return;
         }
-        if (id === undefined) {
-            const typeDelay = randomNumberInRange(30, 70);
-            // console.log(typeDelay);
-            var typewriter = new Typewriter('#answer-text', {
-                autoStart: false,
-                delay: typeDelay,
-            });
 
-            typewriter.typeString(`${answer}`)
-                .callFunction(() => {
-                    window.history.pushState({}, null, "/question/" + questionId);
-                    showAskAnother(true);
-                })
-                .start();
-        }
-        else {
-            showAskAnother(true);
-        }
+        const typeDelay = randomNumberInRange(30, 70);
+        var typewriter = new Typewriter('#answer-text', {
+            autoStart: false,
+            delay: typeDelay,
+        });
 
+        typewriter.typeString(`${answer}`)
+            .callFunction(() => {
+                window.history.pushState({}, null, "/question/" + questionId);
+                showAskAnother(true);
+            })
+            .start();
 
-    }, [answer, id]);
+    }, [answer, id, questionId]);
 
     function randomNumberInRange(min, max) {
         // 👇️ get number between min (inclusive) and max (inclusive)
@@ -117,7 +111,6 @@ function AskQuestion() {
             const result = await response.json();
             //console.log(JSON.stringify(result));
             setAnswer(`${result.answer}`);
-            console.log("new question id", result.id)
             setQuestionId(result.id);
         } else {
             console.log("An error occurred.");
